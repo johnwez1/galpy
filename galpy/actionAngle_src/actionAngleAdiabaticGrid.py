@@ -18,6 +18,7 @@ from galpy.actionAngle_src.actionAngleAdiabatic import actionAngleAdiabatic
 from galpy.actionAngle_src.actionAngle import actionAngle, UnboundError
 import galpy.potential
 from galpy.potential_src.Potential import _evaluatePotentials
+from galpy.potential_src.Potential import flatten as flatten_potential
 from galpy.util import multi
 _PRINTOUTSIDEGRID= False
 class actionAngleAdiabaticGrid(actionAngle):
@@ -67,7 +68,7 @@ class actionAngleAdiabaticGrid(actionAngle):
             raise IOError("Must specify pot= for actionAngleAxi")
         self._c= kwargs.pop('c',False)
         self._gamma= gamma
-        self._pot= pot
+        self._pot= flatten_potential(pot)
         self._zmax= zmax
         self._Rmax= Rmax
         self._Rmin= 0.01
@@ -201,15 +202,16 @@ class actionAngleAdiabaticGrid(actionAngle):
     def _evaluate(self,*args,**kwargs):
         """
         NAME:
-           _evaluate
+           __call__ (_evaluate)
         PURPOSE:
            evaluate the actions (jr,lz,jz)
         INPUT:
            Either:
-              a) R,vR,vT,z,vz
-              b) Orbit instance: initial condition used if that's it, orbit(t)
-                 if there is a time given as well
-           scipy.integrate.quadrature keywords
+              a) R,vR,vT,z,vz[,phi]:
+                 1) floats: phase-space value for single object (phi is optional) (each can be a Quantity)
+                 2) numpy.ndarray: [N] phase-space values for N objects (each can be a Quantity)
+              b) Orbit instance: initial condition used if that's it, orbit(t) if there is a time given as well as the second argument
+           scipy.integrate.quadrature keywords (used when directly evaluating a point off the grid)
         OUTPUT:
            (jr,lz,jz)
         HISTORY:

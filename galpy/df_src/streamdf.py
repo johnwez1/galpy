@@ -4,7 +4,9 @@ import numpy
 import multiprocessing
 import scipy
 from scipy import special, interpolate, integrate, optimize
-if int(scipy.__version__.split('.')[1]) < 10: #pragma: no cover
+_SCIPY_VERSION= [int(v.split('rc')[0])
+                 for v in scipy.__version__.split('.')]
+if _SCIPY_VERSION[0] < 1 and _SCIPY_VERSION[1] < 10: #pragma: no cover
     from scipy.maxentropy import logsumexp
 else:
     from scipy.misc import logsumexp
@@ -14,6 +16,7 @@ from galpy.util import bovy_coords, fast_cholesky_invert, \
     bovy_conversion, multi, bovy_plot, stable_cho_factor, bovy_ars
 from galpy.util.bovy_conversion import physical_conversion, _APY_UNITS
 from galpy.actionAngle_src.actionAngleIsochroneApprox import dePeriod
+from galpy.potential import flatten as flatten_potential
 import warnings
 from galpy.util import galpyWarning
 if _APY_LOADED:
@@ -160,7 +163,7 @@ class streamdf(df):
         self._sigMeanOffset= sigMeanOffset
         if pot is None: #pragma: no cover
             raise IOError("pot= must be set")
-        self._pot= pot
+        self._pot= flatten_potential(pot)
         self._aA= aA
         if not self._aA._pot == self._pot:
             raise IOError("Potential in aA does not appear to be the same as given potential pot")
@@ -361,8 +364,8 @@ class streamdf(df):
                            self._deltaAngleTrack)
         return None
 
-    @physical_conversion('angle_deg',pop=True)
-    def misalignment(self,isotropic=False):
+    @physical_conversion('angle',pop=True)
+    def misalignment(self,isotropic=False,**kwargs):
         """
         NAME:
 
@@ -379,19 +382,22 @@ class streamdf(df):
 
         OUTPUT:
 
-           misalignment in degree
+           misalignment in rad
 
         HISTORY:
 
            2013-12-05 - Written - Bovy (IAS)
 
+           2017-10-28 - Changed output unit to rad - Bovy (UofT)
+
         """
+        warnings.warn("In versions >1.3, the output unit of streamdf.misalignment has been changed to radian (from degree before)",galpyWarning)
         if isotropic:
             dODir= self._dOdJpEig[1][:,numpy.argmax(numpy.fabs(self._dOdJpEig[0]))]
         else:
             dODir= self._dsigomeanProgDirection
-        out= numpy.arccos(numpy.sum(self._progenitor_Omega*dODir)/numpy.sqrt(numpy.sum(self._progenitor_Omega**2.)))/numpy.pi*180.
-        if out > 90.: return out-180.
+        out= numpy.arccos(numpy.sum(self._progenitor_Omega*dODir)/numpy.sqrt(numpy.sum(self._progenitor_Omega**2.)))
+        if out > numpy.pi/2.: return out-numpy.pi
         else: return out
 
     def freqEigvalRatio(self,isotropic=False):
@@ -906,12 +912,12 @@ class streamdf(df):
         if not nTrackIterations is None:
             self.nTrackIterations= nTrackIterations
             return None
-        if numpy.fabs(self.misalignment()) < 1.:
+        if numpy.fabs(self.misalignment(quantity=False)) < 1./180.*numpy.pi:
             self.nTrackIterations= 0
-        elif numpy.fabs(self.misalignment()) >= 1. \
-                and numpy.fabs(self.misalignment()) < 3.:
+        elif numpy.fabs(self.misalignment(quantity=False)) >= 1./180.*numpy.pi \
+                and numpy.fabs(self.misalignment(quantity=False)) < 3./180.*numpy.pi:
             self.nTrackIterations= 1
-        elif numpy.fabs(self.misalignment()) >= 3.:
+        elif numpy.fabs(self.misalignment(quantity=False)) >= 3./180.*numpy.pi:
             self.nTrackIterations= 2
         return None
 

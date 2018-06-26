@@ -8,6 +8,7 @@ from galpy.util import galpyWarning
 import galpy.util.bovy_plot as plot
 import galpy.util.bovy_symplecticode as symplecticode
 from galpy.orbit_src.FullOrbit import _integrateFullOrbit
+from galpy.orbit_src.integrateFullOrbit import _ext_loaded as ext_loaded
 from galpy.util.bovy_conversion import physical_conversion
 from galpy.orbit_src.OrbitTop import OrbitTop
 class RZOrbit(OrbitTop):
@@ -256,7 +257,7 @@ class RZOrbit(OrbitTop):
             kwargs.pop('use_physical')
         return out
 
-    def e(self,analytic=False,pot=None):
+    def e(self,analytic=False,pot=None,**kwargs):
         """
         NAME:
            e
@@ -271,11 +272,10 @@ class RZOrbit(OrbitTop):
            2010-09-15 - Written - Bovy (NYU)
         """
         if analytic:
-            self._setupaA(pot=pot,type='adiabatic')
-            (rperi,rap)= self._aA.calcRapRperi(self)
-            return (rap-rperi)/(rap+rperi)
+            self._setupaA(pot=pot,**kwargs)
+            return float(self._aA.EccZmaxRperiRap(self)[0])
         if not hasattr(self,'orbit'):
-            raise AttributeError("Integrate the orbit first")
+            raise AttributeError("Integrate the orbit first or use analytic=True for approximate eccentricity")
         if not hasattr(self,'rs'):
             self.rs= nu.sqrt(self.orbit[:,0]**2.+self.orbit[:,3]**2.)
         return (nu.amax(self.rs)-nu.amin(self.rs))/(nu.amax(self.rs)+nu.amin(self.rs))
@@ -296,11 +296,10 @@ class RZOrbit(OrbitTop):
            2010-09-20 - Written - Bovy (NYU)
         """
         if analytic:
-            self._setupaA(pot=pot,type='adiabatic')
-            (rperi,rap)= self._aA.calcRapRperi(self)
-            return rap
+            self._setupaA(pot=pot,**kwargs)
+            return float(self._aA.EccZmaxRperiRap(self)[3])
         if not hasattr(self,'orbit'):
-            raise AttributeError("Integrate the orbit first")
+            raise AttributeError("Integrate the orbit first or use analytic=True for approximate rap")
         if not hasattr(self,'rs'):
             self.rs= nu.sqrt(self.orbit[:,0]**2.+self.orbit[:,3]**2.)
         return nu.amax(self.rs)
@@ -321,11 +320,10 @@ class RZOrbit(OrbitTop):
            2010-09-20 - Written - Bovy (NYU)
         """
         if analytic:
-            self._setupaA(pot=pot,type='adiabatic')
-            (rperi,rap)= self._aA.calcRapRperi(self)
-            return rperi
+            self._setupaA(pot=pot,**kwargs)
+            return float(self._aA.EccZmaxRperiRap(self)[2])
         if not hasattr(self,'orbit'):
-            raise AttributeError("Integrate the orbit first")
+            raise AttributeError("Integrate the orbit first or use analytic=True for approximate rperi")
         if not hasattr(self,'rs'):
             self.rs= nu.sqrt(self.orbit[:,0]**2.+self.orbit[:,3]**2.)
         return nu.amin(self.rs)
@@ -344,11 +342,10 @@ class RZOrbit(OrbitTop):
            2010-09-20 - Written - Bovy (NYU)
         """
         if analytic:
-            self._setupaA(pot=pot,type='adiabatic')
-            zmax= self._aA.calczmax(self)
-            return zmax
+            self._setupaA(pot=pot,**kwargs)
+            return float(self._aA.EccZmaxRperiRap(self)[1])
         if not hasattr(self,'orbit'):
-            raise AttributeError("Integrate the orbit first")
+            raise AttributeError("Integrate the orbit first or use analytic=True for approximate zmax")
         return nu.amax(nu.fabs(self.orbit[:,3]))
 
     def plotEz(self,*args,**kwargs):
@@ -474,12 +471,15 @@ def _integrateRZOrbit(vxvv,pot,t,method,dt):
     """
     #First check that the potential has C
     if '_c' in method:
-        if not _check_c(pot):
+        if not ext_loaded or not _check_c(pot):
             if ('leapfrog' in method or 'symplec' in method):
                 method= 'leapfrog'
             else:
                 method= 'odeint'
-            warnings.warn("Cannot use C integration because some of the potentials are not implemented in C (using %s instead)" % (method), galpyWarning)
+            if not ext_loaded: # pragma: no cover
+                warnings.warn("Cannot use C integration because C extension not loaded (using %s instead)" % (method), galpyWarning)
+            else:
+                warnings.warn("Cannot use C integration because some of the potentials are not implemented in C (using %s instead)" % (method), galpyWarning)
     if method.lower() == 'leapfrog' \
             or method.lower() == 'leapfrog_c' or method.lower() == 'rk4_c' \
             or method.lower() == 'rk6_c' or method.lower() == 'symplec4_c' \

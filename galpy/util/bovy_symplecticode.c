@@ -32,24 +32,31 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include "signal.h"
 #include <bovy_symplecticode.h>
 #define _MAX_DT_REDUCE 10000.
+//CTRL-C only works on UNIX systems with signal library
+#ifndef _WIN32
+#include "signal.h"
 volatile sig_atomic_t interrupted= 0;
 void handle_sigint(int signum)
 {
   interrupted= 1;
 }
-inline void leapfrog_leapq(int dim, double *q,double *p,double dt,double *qn){
+#else
+int interrupted= 0;
+#endif
+static inline void leapfrog_leapq(int dim, double *q,double *p,double dt,
+				  double *qn){
   int ii;
   for (ii=0; ii < dim; ii++) (*qn++)= (*q++) +dt * (*p++);
 }
-inline void leapfrog_leapp(int dim, double *p,double dt,double *a,double *pn){
+static inline void leapfrog_leapp(int dim, double *p,double dt,double *a,
+				  double *pn){
   int ii;
   for (ii=0; ii< dim; ii++) (*pn++)= (*p++) + dt * (*a++);
 }
 
-inline void save_qp(int dim, double *qo, double *po, double *result){
+static inline void save_qp(int dim, double *qo, double *po, double *result){
   int ii;
   for (ii=0; ii < dim; ii++) *result++= *qo++;
   for (ii=0; ii < dim; ii++) *result++= *po++;
@@ -112,10 +119,12 @@ void leapfrog(void (*func)(double t, double *q, double *a,
   //Integrate the system
   double to= *t;
   // Handle KeyboardInterrupt gracefully
+#ifndef _WIN32
   struct sigaction action;
   memset(&action, 0, sizeof(struct sigaction));
   action.sa_handler= handle_sigint;
   sigaction(SIGINT,&action,NULL);
+#endif
   for (ii=0; ii < (nt-1); ii++){
     if ( interrupted ) {
       *err= -10;
@@ -150,8 +159,10 @@ void leapfrog(void (*func)(double t, double *q, double *a,
     result+= 2 * dim;
   }
   // Back to default handler
+#ifndef _WIN32
   action.sa_handler= SIG_DFL;
   sigaction(SIGINT,&action,NULL);
+#endif
   //Free allocated memory
   free(qo);
   free(po);
@@ -226,10 +237,12 @@ void symplec4(void (*func)(double t, double *q, double *a,
   //Integrate the system
   double to= *t;
   // Handle KeyboardInterrupt gracefully
+#ifndef _WIN32
   struct sigaction action;
   memset(&action, 0, sizeof(struct sigaction));
   action.sa_handler= handle_sigint;
   sigaction(SIGINT,&action,NULL);
+#endif
   for (ii=0; ii < (nt-1); ii++){
     if ( interrupted ) {
       *err= -10;
@@ -291,8 +304,10 @@ void symplec4(void (*func)(double t, double *q, double *a,
     result+= 2 * dim;
   }
   // Back to default handler
+#ifndef _WIN32
   action.sa_handler= SIG_DFL;
   sigaction(SIGINT,&action,NULL);
+#endif
   //Free allocated memory
   free(qo);
   free(po);
@@ -375,10 +390,12 @@ void symplec6(void (*func)(double t, double *q, double *a,
   //Integrate the system
   double to= *t;
   // Handle KeyboardInterrupt gracefully
+#ifndef _WIN32
   struct sigaction action;
   memset(&action, 0, sizeof(struct sigaction));
   action.sa_handler= handle_sigint;
   sigaction(SIGINT,&action,NULL);
+#endif
   for (ii=0; ii < (nt-1); ii++){
     if ( interrupted ) {
       *err= -10;
@@ -488,8 +505,10 @@ void symplec6(void (*func)(double t, double *q, double *a,
     result+= 2 * dim;
   }
   // Back to default handler
+#ifndef _WIN32
   action.sa_handler= SIG_DFL;
   sigaction(SIGINT,&action,NULL);
+#endif
   //Free allocated memory
   free(qo);
   free(po);

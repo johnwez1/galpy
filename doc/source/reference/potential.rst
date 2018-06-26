@@ -29,13 +29,17 @@ Use as ``Potential-instance.method(...)``
    plotDensity <potentialplotdensity.rst>
    plotEscapecurve <potentialplotescapecurve.rst>
    plotRotcurve <potentialplotrotcurve.rst>
+   Rphideriv <potentialrphideriv.rst>
    R2deriv <potentialr2deriv.rst>
+   r2deriv <potentialsphr2deriv.rst>
    Rzderiv <potentialrzderiv.rst>
    Rforce <potentialrforce.rst>
    rforce <potentialsphrforce.rst>
    rl <potentialrl.rst>
+   rtide <potentialrtide.rst>
    toPlanar <potentialtoplanar.rst>
    toVertical <potentialtovertical.rst>
+   ttensor <potentialttensor.rst>
    turn_physical_off <potentialturnphysicaloff.rst>
    turn_physical_on <potentialturnphysicalon.rst>
    vcirc <potentialvcirc.rst>
@@ -67,12 +71,16 @@ Use as ``method(...)``
    evaluateDensities <potentialdensities.rst>
    evaluatephiforces <potentialphiforces.rst>
    evaluatePotentials <potentialevaluate.rst>
+   evaluatephi2derivs <potentialphi2derivs.rst>
+   evaluateRphiderivs <potentialrphiderivs.rst>
    evaluateR2derivs <potentialr2derivs.rst>
+   evaluater2derivs <potentialsphr2derivs.rst>
    evaluateRzderivs <potentialrzderivs.rst>
    evaluateRforces <potentialrforces.rst>
    evaluaterforces <potentialsphrforces.rst>
    evaluatez2derivs <potentialz2derivs.rst>
    evaluatezforces <potentialzforces.rst>
+   flatten <potentialflatten.rst>
    flattening <potentialflattenings.rst>
    lindbladR <potentiallindbladRs.rst>
    nemo_accname <potentialnemoaccnames.rst>
@@ -83,6 +91,8 @@ Use as ``method(...)``
    plotPotentials <potentialplots.rst>
    plotRotcurve <potentialplotrotcurves.rst>
    rl <potentialrls.rst>
+   rtide <potentialrtides.rst>
+   ttensor <potentialttensors.rst>
    turn_physical_off <potentialturnphysicaloffs.rst>
    turn_physical_on <potentialturnphysicalons.rst>
    vcirc <potentialvcircs.rst>
@@ -149,6 +159,7 @@ Triaxial, spiral, and bar potentials
    potentialdehnenbar.rst
    potentialdoublepowertriaxial.rst
    potentialferrers.rst
+   potentialloghalo.rst
    potentialmovingobj.rst
    potentialsoftenedneedle.rst
    potentialspiralarms.rst
@@ -188,9 +199,11 @@ done by
 
 >>> from galpy.potential import KeplerPotential
 >>> from galpy.util import bovy_conversion
->>> MWPotential2014.append(KeplerPotential(amp=4*10**6./bovy_conversion.mass_in_msol(220.,8.)))
+>>> MWPotential2014wBH= [MWPotential2014,KeplerPotential(amp=4*10**6./bovy_conversion.mass_in_msol(220.,8.))]
 
-for a black hole with a mass of :math:`4\times10^6\,M_{\odot}`.
+for a black hole with a mass of :math:`4\times10^6\,M_{\odot}` (this
+works because a list of Potential instances can contain a nested list
+of Potential instances in versions>=1.4).
 
 As explained in :ref:`this section <nemopot>`, *without* this black
 hole ``MWPotential2014`` can be used with Dehnen's gyrfalcON code
@@ -255,6 +268,7 @@ Use as ``method(...)``
    evaluateplanarPotentials <potential2devaluate.rst>
    evaluateplanarRforces <potential2drforces.rst>
    evaluateplanarR2derivs <potential2dr2derivs.rst>
+   flatten <potentialflatten.rst>
    LinShuReductionFactor <potential2dlinshureductionfactor.rst>
    plotEscapecurve <potentialplotescapecurves.rst>
    plotplanarPotentials <potential2dplots.rst>
@@ -274,7 +288,7 @@ potentials in the mid-plane.
    toPlanarPotential (general) <potential2dtoplanar.rst>
    RZToplanarPotential <potential2dRZtoplanar.rst>
 
-In addition, a two-dimensional bar potential, two spiral potentials, and some static non-axisymmetric perturbations are included
+In addition, a two-dimensional bar potential, two spiral potentials, the `Henon & Heiles (1964) <http://adsabs.harvard.edu/abs/1964AJ.....69...73H>`__ potential, and some static non-axisymmetric perturbations are included
 
 .. toctree::
    :maxdepth: 2
@@ -282,6 +296,7 @@ In addition, a two-dimensional bar potential, two spiral potentials, and some st
    potentialdehnenbar.rst
    potentialcosmphidisk.rst
    potentialellipticaldisk.rst
+   potentialhenonheiles.rst
    potentiallopsideddisk.rst
    potentialsteadylogspiral.rst
    potentialtransientlogspiral.rst
@@ -315,6 +330,7 @@ Use as ``method(...)``
 
    evaluatelinearForces <potential1dforces.rst>
    evaluatelinearPotentials <potential1devaluate.rst>
+   flatten <potentialflatten.rst>
    plotlinearPotentials <potential1dplots.rst>
    turn_physical_off <potentialturnphysicaloffs.rst>
    turn_physical_on <potentialturnphysicalons.rst>
@@ -347,5 +363,8 @@ Specific wrappers
 .. toctree::
    :maxdepth: 2
 
+   potentialcorotwrapper.rst
    potentialdehnensmoothwrapper.rst
+   potentialgaussampwrapper.rst
    potentialsolidbodyrotationwrapper.rst
+

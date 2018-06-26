@@ -7,6 +7,7 @@ from galpy import potential
 from galpy import actionAngle
 from galpy.actionAngle import actionAngleIsochrone
 from galpy.potential import IsochronePotential
+from galpy.potential import flatten as flatten_potential
 from galpy.orbit import Orbit
 from galpy.df_src.df import df, _APY_LOADED
 from galpy.util import galpyWarning
@@ -103,7 +104,7 @@ class quasiisothermaldf(df):
         self._lnsz= math.log(self._sz)
         if pot is None:
             raise IOError("pot= must be set")
-        self._pot= pot
+        self._pot= flatten_potential(pot)
         if aA is None:
             raise IOError("aA= must be set")
         self._aA= aA
@@ -522,7 +523,9 @@ class quasiisothermaldf(df):
 
         OPTIONAL INPUT:
 
-           nsigma - number of sigma to integrate the velocities over (when doing explicit numerical integral)
+           nsigma - number of sigma to integrate the vR and vz velocities over (when doing explicit numerical integral; default: 4)
+           
+           vTmax - upper limit for integration over vT (default: 1.5)
 
            mc= if True, calculate using Monte Carlo integration
 
@@ -646,7 +649,9 @@ class quasiisothermaldf(df):
                 vzglw= list(vzglw)
                 vzglw.extend(glw12)
                 vzglw= numpy.array(vzglw)
-            vTgl= 1.5/2.*(glx+1.)
+            if 'vTmax' in kwargs: vTmax = kwargs['vTmax']
+            else:                 vTmax = 1.5
+            vTgl= vTmax/2.*(glx+1.)
             #Tile everything
             vTgl= numpy.tile(vTgl,(ngl,ngl,1)).T
             vRgl= numpy.tile(numpy.reshape(vRgl,(1,ngl)).T,(ngl,1,ngl))
@@ -686,20 +691,20 @@ class quasiisothermaldf(df):
                 logqeval= _glqeval
             if _returngl:
                 return (numpy.sum(numpy.exp(logqeval)*vRgl**n*vTgl**m*vzgl**o
-                                  *vTglw*vRglw*vzglw)*sigmaR1*sigmaz1*0.1875*nsigma**2,
+                                  *vTglw*vRglw*vzglw)*sigmaR1*sigmaz1*0.125*vTmax*nsigma**2,
                         logqeval)
             elif _return_actions and _return_freqs:
                 return (numpy.sum(numpy.exp(logqeval)*vRgl**n*vTgl**m*vzgl**o
-                                  *vTglw*vRglw*vzglw)*sigmaR1*sigmaz1*0.1875*nsigma**2,
+                                  *vTglw*vRglw*vzglw)*sigmaR1*sigmaz1*0.125*vTmax*nsigma**2,
                         jr,lz,jz,
                         rg,kappa,nu,Omega)
             elif _return_actions:
                 return (numpy.sum(numpy.exp(logqeval)*vRgl**n*vTgl**m*vzgl**o
-                                  *vTglw*vRglw*vzglw)*sigmaR1*sigmaz1*0.1875*nsigma**2,
+                                  *vTglw*vRglw*vzglw)*sigmaR1*sigmaz1*0.125*vTmax*nsigma**2,
                         jr,lz,jz)
             else:
                 return numpy.sum(numpy.exp(logqeval)*vRgl**n*vTgl**m*vzgl**o
-                                 *vTglw*vRglw*vzglw*sigmaR1*sigmaz1*0.1875*nsigma**2)
+                                 *vTglw*vRglw*vzglw*sigmaR1*sigmaz1*0.125*vTmax*nsigma**2)
         elif mc:
             mvT= (thisvc-va)/gamma/sigmaR1
             if _vrs is None:
@@ -1027,7 +1032,7 @@ class quasiisothermaldf(df):
                                             **kwargs))
         
     @potential_physical_input
-    @physical_conversion('angle_deg',pop=True)
+    @physical_conversion('angle',pop=True)
     def tilt(self,R,z,nsigma=None,mc=False,nmc=10000,
              gl=True,ngl=_DEFAULTNGL,**kwargs):
         """
@@ -1061,13 +1066,16 @@ class quasiisothermaldf(df):
 
         OUTPUT:
 
-           tilt in degree
+           tilt in rad
 
         HISTORY:
 
            2012-12-23 - Written - Bovy (IAS)
 
+           2017-10-28 - Changed return unit to rad - Bovy (UofT)
+
         """
+        warnings.warn("In versions >1.3, the output unit of quasiisothermaldf.tilt has been changed to radian (from degree before)",galpyWarning)
         if mc:
             surfmass, vrs, vts, vzs= self._vmomentdensity(R,z,0.,0.,0.,
                                                              nsigma=nsigma,mc=mc,nmc=nmc,_returnmc=True,
@@ -1084,7 +1092,7 @@ class quasiisothermaldf(df):
                                               nsigma=nsigma,mc=mc,nmc=nmc,_returnmc=False,
                                               _vrs=vrs,_vts=vts,_vzs=vzs,
                                               **kwargs)/surfmass
-            return 0.5*numpy.arctan(2.*tsigmarz/(tsigmar2-tsigmaz2))/numpy.pi*180.
+            return 0.5*numpy.arctan(2.*tsigmarz/(tsigmar2-tsigmaz2))
         elif gl:
             surfmass, glqeval= self._vmomentdensity(R,z,0.,0.,0.,
                                                        gl=gl,ngl=ngl,
@@ -1102,7 +1110,7 @@ class quasiisothermaldf(df):
                                               ngl=ngl,gl=gl,
                                               _glqeval=glqeval,
                                               **kwargs)/surfmass
-            return 0.5*numpy.arctan(2.*tsigmarz/(tsigmar2-tsigmaz2))/numpy.pi*180.
+            return 0.5*numpy.arctan(2.*tsigmarz/(tsigmar2-tsigmaz2))
         else:
             raise NotImplementedError("Use either mc=True or gl=True")
         
@@ -1679,7 +1687,7 @@ class quasiisothermaldf(df):
 
     @actionAngle_physical_input
     @physical_conversion('phasespacedensityvelocity2',pop=True)
-    def pvR(self,vR,R,z,gl=True,ngl=_DEFAULTNGL2):
+    def pvR(self,vR,R,z,gl=True,ngl=_DEFAULTNGL2,nsigma=4.,vTmax=1.5):
         """
         NAME:
 
@@ -1700,6 +1708,10 @@ class quasiisothermaldf(df):
            gl - use Gauss-Legendre integration (True, currently the only option)
 
            ngl - order of Gauss-Legendre integration
+
+           nsigma - sets integration limits to [-1,+1]*nsigma*sigma_z(R) for integration over vz (default: 4)
+
+           vTmax - sets integration limits to [0,vTmax] for integration over vT (default: 1.5)
 
         OUTPUT:
 
@@ -1727,18 +1739,21 @@ class quasiisothermaldf(df):
             #Evaluate everywhere
             if isinstance(self._aA,(actionAngle.actionAngleAdiabatic,
                                     actionAngle.actionAngleAdiabaticGrid)):
-                vzgl= 4.*sigmaz1/2.*(glx+1.)
+                vzgl= nsigma*sigmaz1/2.*(glx+1.)
                 vzglw= glw
+                vzfac= nsigma*sigmaz1  #2 x integration over [0,nsigma*sigmaz1]
             else:
-                vzgl= 4.*sigmaz1/2.*(glx12+1.)
+                vzgl= nsigma*sigmaz1/2.*(glx12+1.)
                 vzgl= list(vzgl)
-                vzgl.extend(-4.*sigmaz1/2.*(glx12+1.))
+                vzgl.extend(-nsigma*sigmaz1/2.*(glx12+1.))
                 vzgl= numpy.array(vzgl)
                 vzglw= glw12
                 vzglw= list(vzglw)
                 vzglw.extend(glw12)
                 vzglw= numpy.array(vzglw)
-            vTgl= 1.5/2.*(glx+1.)
+                vzfac = 0.5*nsigma*sigmaz1   #integration over [-nsigma*sigmaz1,0] and [0,nsigma*sigmaz1]
+            vTgl= vTmax/2.*(glx+1.)
+            vTfac= 0.5 * vTmax  #integration over [0.,vTmax]
             #Tile everything
             vTgl= numpy.tile(vTgl,(ngl,1)).T
             vzgl= numpy.tile(vzgl,(ngl,1))
@@ -1753,11 +1768,11 @@ class quasiisothermaldf(df):
                                          log=True,
                                          use_physical=False),
                                     (ngl,ngl))
-            return numpy.sum(numpy.exp(logqeval)*vTglw*vzglw*sigmaz1)*1.5
+            return numpy.sum(numpy.exp(logqeval)*vTglw*vzglw*vzfac)*vTfac
 
     @actionAngle_physical_input
     @physical_conversion('phasespacedensityvelocity2',pop=True)
-    def pvT(self,vT,R,z,gl=True,ngl=_DEFAULTNGL2):
+    def pvT(self,vT,R,z,gl=True,ngl=_DEFAULTNGL2,nsigma=4.):
         """
         NAME:
 
@@ -1779,6 +1794,8 @@ class quasiisothermaldf(df):
 
            ngl - order of Gauss-Legendre integration
 
+           nsigma - sets integration limits to [-1,+1]*nsigma*sigma(R) for integration over vz and vR (default: 4)
+
         OUTPUT:
 
            p(vT,R,z)
@@ -1786,6 +1803,7 @@ class quasiisothermaldf(df):
         HISTORY:
 
            2012-12-22 - Written - Bovy (IAS)
+           2018-01-12 - Added Gauss-Legendre integration prefactor nsigma^2/4 - Trick (MPA)
 
         """
         sigmaR1= self._sr*numpy.exp((self._refr-R)/self._hsr)
@@ -1806,18 +1824,20 @@ class quasiisothermaldf(df):
             #Evaluate everywhere
             if isinstance(self._aA,(actionAngle.actionAngleAdiabatic,
                                     actionAngle.actionAngleAdiabaticGrid)):
-                vRgl= 4.*sigmaR1/2.*(glx+1.)
-                vzgl= 4.*sigmaz1/2.*(glx+1.)
+                vRgl= nsigma*sigmaR1/2.*(glx+1.)
+                vzgl= nsigma*sigmaz1/2.*(glx+1.)
                 vRglw= glw
                 vzglw= glw
+                vRfac= nsigma*sigmaR1  #2 x integration over [0,nsigma*sigmaR1]
+                vzfac= nsigma*sigmaz1  #2 x integration over [0,nsigma*sigmaz1]
             else:
-                vRgl= 4.*sigmaR1/2.*(glx12+1.)
+                vRgl= nsigma*sigmaR1/2.*(glx12+1.)
                 vRgl= list(vRgl)
-                vRgl.extend(-4.*sigmaR1/2.*(glx12+1.))
+                vRgl.extend(-nsigma*sigmaR1/2.*(glx12+1.))
                 vRgl= numpy.array(vRgl)
-                vzgl= 4.*sigmaz1/2.*(glx12+1.)
+                vzgl= nsigma*sigmaz1/2.*(glx12+1.)
                 vzgl= list(vzgl)
-                vzgl.extend(-4.*sigmaz1/2.*(glx12+1.))
+                vzgl.extend(-nsigma*sigmaz1/2.*(glx12+1.))
                 vzgl= numpy.array(vzgl)
                 vRglw= glw12
                 vRglw= list(vRglw)
@@ -1827,6 +1847,8 @@ class quasiisothermaldf(df):
                 vzglw= list(vzglw)
                 vzglw.extend(glw12)
                 vzglw= numpy.array(vzglw)
+                vRfac = 0.5*nsigma*sigmaR1   #integration over [-nsigma*sigmaR1,0] and [0,nsigma*sigmaR1]
+                vzfac = 0.5*nsigma*sigmaz1   #integration over [-nsigma*sigmaz1,0] and [0,nsigma*sigmaz1]
             #Tile everything
             vRgl= numpy.tile(vRgl,(ngl,1)).T
             vzgl= numpy.tile(vzgl,(ngl,1))
@@ -1841,11 +1863,12 @@ class quasiisothermaldf(df):
                                          log=True,
                                          use_physical=False),
                                     (ngl,ngl))
-            return numpy.sum(numpy.exp(logqeval)*vRglw*vzglw*sigmaR1*sigmaz1)
+            return numpy.sum(numpy.exp(logqeval)*vRglw*vzglw*vRfac*vzfac)
 
     @actionAngle_physical_input
     @physical_conversion('phasespacedensityvelocity2',pop=True)
     def pvz(self,vz,R,z,gl=True,ngl=_DEFAULTNGL2,
+            nsigma=4.,vTmax=1.5,
             _return_actions=False,_jr=None,_lz=None,_jz=None,
             _return_freqs=False,
             _rg=None,_kappa=None,_nu=None,_Omega=None,
@@ -1870,6 +1893,10 @@ class quasiisothermaldf(df):
            gl - use Gauss-Legendre integration (True, currently the only option)
 
            ngl - order of Gauss-Legendre integration
+
+           nsigma - sets integration limits to [-1,+1]*nsigma*sigma_R(R) for integration over vR (default: 4)
+
+           vTmax - sets integration limits to [0,vTmax] for integration over vT (default: 1.5)
 
         OUTPUT:
 
@@ -1902,6 +1929,7 @@ class quasiisothermaldf(df):
                                     actionAngle.actionAngleAdiabaticGrid)):
                 vRgl= (glx+1.)
                 vRglw= glw
+                vRfac= nsigma*sigmaR1  #2 x integration over [0,nsigma*sigmaR1]
             else:
                 vRgl= (glx12+1.)
                 vRgl= list(vRgl)
@@ -1911,7 +1939,9 @@ class quasiisothermaldf(df):
                 vRglw= list(vRglw)
                 vRglw.extend(glw12)
                 vRglw= numpy.array(vRglw)
-            vTgl= 1.5/2.*(glx+1.)
+                vRfac = 0.5*nsigma*sigmaR1   #integration over [-nsigma*sigmaR1,0] and [0,nsigma*sigmaR1]
+            vTgl= vTmax/2.*(glx+1.)
+            vTfac= 0.5 * vTmax  #integration over [0.,vTmax]
             #Tile everything
             vTgl= numpy.tile(vTgl,(ngl,1)).T
             vRgl= numpy.tile(vRgl,(ngl,1))
@@ -1935,7 +1965,7 @@ class quasiisothermaldf(df):
                 nR= 1
                 scalarOut= True
                 vRgl= vRgl.flatten()
-            vRgl*= numpy.tile(4.*sigmaR1/2.,(ngl,ngl,1)).T.flatten()
+            vRgl*= numpy.tile(nsigma*sigmaR1/2.,(ngl,ngl,1)).T.flatten()
             #evaluate
             if _jr is None and _rg is None:
                 logqeval, jr, lz, jz, rg, kappa, nu, Omega= self(R,
@@ -1980,9 +2010,9 @@ class quasiisothermaldf(df):
             vRglw= numpy.reshape(vRglw,(nR,ngl*ngl))
             vTglw= numpy.reshape(vTglw,(nR,ngl*ngl))
             if scalarOut:
-                result= numpy.sum(numpy.exp(logqeval)*vTglw*vRglw,axis=1)[0]*sigmaR1*1.5
+                result= numpy.sum(numpy.exp(logqeval)*vTglw*vRglw,axis=1)[0]*vRfac*vTfac
             else:
-                result= numpy.sum(numpy.exp(logqeval)*vTglw*vRglw,axis=1)*sigmaR1*1.5
+                result= numpy.sum(numpy.exp(logqeval)*vTglw*vRglw,axis=1)*vRfac*vTfac
             if _return_actions and _return_freqs:
                 return (result,
                         jr,lz,jz,
@@ -1998,7 +2028,7 @@ class quasiisothermaldf(df):
 
     @actionAngle_physical_input
     @physical_conversion('phasespacedensityvelocity',pop=True)
-    def pvRvT(self,vR,vT,R,z,gl=True,ngl=_DEFAULTNGL2):
+    def pvRvT(self,vR,vT,R,z,gl=True,ngl=_DEFAULTNGL2,nsigma=4.):
         """
         NAME:
 
@@ -2021,6 +2051,8 @@ class quasiisothermaldf(df):
            gl - use Gauss-Legendre integration (True, currently the only option)
 
            ngl - order of Gauss-Legendre integration
+           
+           nsigma - sets integration limits to [-1,+1]*nsigma*sigma_z(R) for integration over vz (default: 4)
 
         OUTPUT:
 
@@ -2028,7 +2060,8 @@ class quasiisothermaldf(df):
 
         HISTORY:
 
-           2013-01-02 - Written - Bovy (IAS)
+           2013-01-02 - Written - Bovy (IAS)           
+           2018-01-12 - Added Gauss-Legendre integration prefactor nsigma/2 - Trick (MPA)
 
         """
         sigmaz1= self._sz*numpy.exp((self._refr-R)/self._hsz)
@@ -2048,17 +2081,19 @@ class quasiisothermaldf(df):
             #Evaluate everywhere
             if isinstance(self._aA,(actionAngle.actionAngleAdiabatic,
                                     actionAngle.actionAngleAdiabaticGrid)):
-                vzgl= 4.*sigmaz1/2.*(glx+1.)
+                vzgl= nsigma*sigmaz1/2.*(glx+1.)
                 vzglw= glw
+                vzfac= nsigma*sigmaz1  #2 x integration over [0,nsigma*sigmaz1]
             else:
-                vzgl= 4.*sigmaz1/2.*(glx12+1.)
+                vzgl= nsigma*sigmaz1/2.*(glx12+1.)
                 vzgl= list(vzgl)
-                vzgl.extend(-4.*sigmaz1/2.*(glx12+1.))
+                vzgl.extend(-nsigma*sigmaz1/2.*(glx12+1.))
                 vzgl= numpy.array(vzgl)
                 vzglw= glw12
                 vzglw= list(vzglw)
                 vzglw.extend(glw12)
                 vzglw= numpy.array(vzglw)
+                vzfac = 0.5*nsigma*sigmaz1   #integration over [-nsigma*sigmaz1,0] and [0,nsigma*sigmaz1]
             #evaluate
             logqeval= self(R+numpy.zeros(ngl),
                            vR+numpy.zeros(ngl),
@@ -2066,11 +2101,11 @@ class quasiisothermaldf(df):
                            z+numpy.zeros(ngl),
                            vzgl,
                            log=True,use_physical=False)
-            return numpy.sum(numpy.exp(logqeval)*vzglw*sigmaz1)
-        
+            return numpy.sum(numpy.exp(logqeval)*vzglw*vzfac)
+
     @actionAngle_physical_input
     @physical_conversion('phasespacedensityvelocity',pop=True)
-    def pvTvz(self,vT,vz,R,z,gl=True,ngl=_DEFAULTNGL2):
+    def pvTvz(self,vT,vz,R,z,gl=True,ngl=_DEFAULTNGL2,nsigma=4.):
         """
         NAME:
 
@@ -2093,6 +2128,8 @@ class quasiisothermaldf(df):
            gl - use Gauss-Legendre integration (True, currently the only option)
 
            ngl - order of Gauss-Legendre integration
+           
+           nsigma - sets integration limits to [-1,+1]*nsigma*sigma_R(R) for integration over vR (default: 4)
 
         OUTPUT:
 
@@ -2100,7 +2137,8 @@ class quasiisothermaldf(df):
 
         HISTORY:
 
-           2012-12-22 - Written - Bovy (IAS)
+           2012-12-22 - Written - Bovy (IAS)           
+           2018-01-12 - Added Gauss-Legendre integration prefactor nsigma/2 - Trick (MPA)
 
         """
         sigmaR1= self._sr*numpy.exp((self._refr-R)/self._hsr)
@@ -2120,17 +2158,19 @@ class quasiisothermaldf(df):
             #Evaluate everywhere
             if isinstance(self._aA,(actionAngle.actionAngleAdiabatic,
                                     actionAngle.actionAngleAdiabaticGrid)):
-                vRgl= 4.*sigmaR1/2.*(glx+1.)
+                vRgl= nsigma*sigmaR1/2.*(glx+1.)
                 vRglw= glw
+                vRfac= nsigma*sigmaR1  #2 x integration over [0,nsigma*sigmaR1]
             else:
-                vRgl= 4.*sigmaR1/2.*(glx12+1.)
+                vRgl= nsigma*sigmaR1/2.*(glx12+1.)
                 vRgl= list(vRgl)
-                vRgl.extend(-4.*sigmaR1/2.*(glx12+1.))
+                vRgl.extend(-nsigma*sigmaR1/2.*(glx12+1.))
                 vRgl= numpy.array(vRgl)
                 vRglw= glw12
                 vRglw= list(vRglw)
                 vRglw.extend(glw12)
                 vRglw= numpy.array(vRglw)
+                vRfac = 0.5*nsigma*sigmaR1   #integration over [-nsigma*sigmaR1,0] and [0,nsigma*sigmaR1]
             #evaluate
             logqeval= self(R+numpy.zeros(ngl),
                            vRgl,
@@ -2138,11 +2178,11 @@ class quasiisothermaldf(df):
                            z+numpy.zeros(ngl),
                            vz+numpy.zeros(ngl),
                            log=True,use_physical=False)
-            return numpy.sum(numpy.exp(logqeval)*vRglw*sigmaR1)
+            return numpy.sum(numpy.exp(logqeval)*vRglw*vRfac)
 
     @actionAngle_physical_input
     @physical_conversion('phasespacedensityvelocity',pop=True)
-    def pvRvz(self,vR,vz,R,z,gl=True,ngl=_DEFAULTNGL2):
+    def pvRvz(self,vR,vz,R,z,gl=True,ngl=_DEFAULTNGL2,vTmax=1.5):
         """
         NAME:
 
@@ -2165,6 +2205,8 @@ class quasiisothermaldf(df):
            gl - use Gauss-Legendre integration (True, currently the only option)
 
            ngl - order of Gauss-Legendre integration
+           
+           vTmax - sets integration limits to [0,vTmax] for integration over vT (default: 1.5)
 
         OUTPUT:
 
@@ -2173,6 +2215,7 @@ class quasiisothermaldf(df):
         HISTORY:
 
            2013-01-02 - Written - Bovy (IAS)
+           2018-01-12 - Added Gauss-Legendre integration prefactor vTmax/2 - Trick (MPA)
 
         """
         if gl:
@@ -2189,8 +2232,9 @@ class quasiisothermaldf(df):
                 glx, glw= numpy.polynomial.legendre.leggauss(ngl)
                 glx12, glw12= numpy.polynomial.legendre.leggauss(ngl//2)
             #Evaluate everywhere
-            vTgl= 1.5/2.*(glx+1.)
+            vTgl= vTmax/2.*(glx+1.)
             vTglw= glw
+            vTfac= 0.5 * vTmax  #integration over [0.,vTmax]
             #If inputs are arrays, tile
             if isinstance(R,numpy.ndarray):
                 nR= len(R)
@@ -2217,7 +2261,7 @@ class quasiisothermaldf(df):
                                          log=True,
                                          use_physical=False),
                                     (nR,ngl))
-            out= numpy.sum(numpy.exp(logqeval)*vTglw,axis=1)
+            out= numpy.sum(numpy.exp(logqeval)*vTglw*vTfac,axis=1)
             if scalarOut: return out[0]
             else: return out
 

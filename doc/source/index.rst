@@ -27,6 +27,13 @@ to `contribute to the code
 please head over to `galpy's GitHub page
 <https://github.com/jobovy/galpy>`_ for more information.
 
+As a preview of the kinds of things you can do with galpy, here's an
+:ref:`animation <orbanim>` of the orbit of the Sun in galpy's
+``MWPotential2014`` potential over 7 Gyr:
+
+.. raw:: html
+   :file: orbitsun.html
+
 Quick-start guide
 -----------------
 
@@ -82,15 +89,18 @@ If you use galpy in a publication, please cite the following paper
 * *galpy: A Python Library for Galactic Dynamics*, Jo Bovy (2015), *Astrophys. J. Supp.*, **216**, 29 (`arXiv/1412.3451 <http://arxiv.org/abs/1412.3451>`_).
 
 and link to ``http://github.com/jobovy/galpy``. Some of the code's
-functionality is introduced in separate papers (like
-``galpy.df.streamdf`` and ``galpy.df.streamgapdf``, see below), so
-please also cite those papers when using these functions. Please also
-send me a reference to the paper or send a pull request including your
-paper in the list of galpy papers on this page (this page is at
-doc/source/index.rst). Thanks!
+functionality is introduced in separate papers:
 
-When using the ``galpy.actionAngle.actionAngleAdiabatic`` and ``galpy.actionAngle.actionAngleStaeckel`` modules, please cite `2013ApJ...779..115B <http://adsabs.harvard.edu/abs/2013ApJ...779..115B>`_ in addition to the papers describing the algorithm used. When using ``galpy.actionAngle.actionAngleIsochroneApprox``, please cite `2014ApJ...795...95B <http://adsabs.harvard.edu/abs/2014ApJ...795...95B>`_, which introduced this technique.
+* ``galpy.actionAngle.EccZmaxRperiRap`` and ``galpy.orbit.Orbit`` methods with ``analytic=True``: Fast method for computing orbital parameters from :ref:`this section <fastchar>`: please cite `Mackereth & Bovy (2018) <https://arxiv.org/abs/1802.02592>`__.
+* ``galpy.actionAngle.actionAngleAdiabatic``: please cite `Binney (2010) <http://adsabs.harvard.edu/abs/2010MNRAS.401.2318B>`__.
+* ``galpy.actionAngle.actionAngleStaeckel``:  please cite `Bovy & Rix (2013) <http://adsabs.harvard.edu/abs/2013ApJ...779..115B>`__ and `Binney (2012) <http://adsabs.harvard.edu/abs/2012MNRAS.426.1324B>`__.
+* ``galpy.actionAngle.actionAngleIsochroneApprox``: please cite `Bovy (2014) <http://adsabs.harvard.edu/abs/2014ApJ...795...95B>`__.
+* ``galpy.df.streamdf``: please cite `Bovy (2014) <http://adsabs.harvard.edu/abs/2014ApJ...795...95B>`__.
+* ``galpy.df.streamgapdf``: please cite `Sanders, Bovy, & Erkal (2016) <http://adsabs.harvard.edu/abs/2016MNRAS.457.3817S>`__.
 
+Please also send me a reference to the paper or send a pull request
+including your paper in the list of galpy papers on this page (this
+page is at doc/source/index.rst). Thanks!
 
 Papers using galpy
 --------------------
@@ -212,10 +222,102 @@ The following is a list of publications using ``galpy``; please let me (bovy at 
      Uses ``galpy.orbit`` integration in a custom Milky-Way-like potential built from ``galpy.potential`` models to investigate the orbits of hypervelocity-star candidates in *Gaia* DR1.
 #. *GalRotpy: an educational tool to understand and parametrize the rotation curve and gravitational potential of disk-like galaxies*, Andrés Granados, Lady-J. Henao-O., Santiago Vanegas, & Leonardo Castañeda (2017; `arXiv/1705.01665 <http://arxiv.org/abs/1705.01665>`_):
      These authors build an interactive tool to decompose observed rotation curves into bulge, disk (Miyamoto-Nagai or exponential), and NFW halo components on top of ``galpy.potential`` routines.
-#. *The AMBRE Project: formation and evolution of the Milky Way disc*, V. Grisoni, E. Spitoni, F. Matteucci, A. Recio-Blanco, P. de Laverny, M. Hayden, S. Mikolaitis, & C. C. Worley (2017; `arXiv/1706.02614 <http://arxiv.org/abs/1706.02614>`_):
+#. *The AMBRE Project: formation and evolution of the Milky Way disc*, V. Grisoni, E. Spitoni, F. Matteucci, A. Recio-Blanco, P. de Laverny, M. Hayden, S. Mikolaitis, & C. C. Worley (2017) *Mon. Not. Roy. Astron. Soc.*, in press (`arXiv/1706.02614 <http://arxiv.org/abs/1706.02614>`_):
      Uses ``galpy`` to compute orbital parameters for stars in the AMBRE sample of high-resolution spectra and uses these orbital parameters to aid in the comparison between the data and chemical-evolution models.
-#. *Detailed chemical abundance analysis of the thick disk star cluster Gaia 1*, Andreas Koch, Terese T. Hansen, & Andrea Kunder (2017; `arXiv/1709.04022 <http://arxiv.org/abs/1709.04022>`_):
+#. *Low-mass X-ray binaries from black-hole retaining globular clusters*, Matthew Giesler, Drew Clausen, & Christian D. Ott (2017) *Mon. Not. Roy. Astron. Soc.*, in press (`arXiv/1708.05915 <http://arxiv.org/abs/1708.05915>`_):
+     Employs ``galpy.orbit`` integration in ``MWPotential2014`` to compute the orbits of MW globular clusters and simulated ejected BH low-mass X-ray binaries from these globular clusters to determine where they end up today.
+#. *ESO452-SC11: The lowest mass globular cluster with a potential chemical inhomogeneity*, Jeffrey D. Simpson, Gayandhi De Silva, Sarah L. Martell, Colin A. Navin, & Daniel B. Zucker (2017) *Mon. Not. Roy. Astron. Soc.*, in press (`arXiv/1708.06875 <http://arxiv.org/abs/1708.06875>`_):
+     Uses ``galpy.orbit`` in ``MWPotential2014`` to compute the orbit of the MW bulge globular cluster ESO452-SC11.
+#. *The Hercules stream as seen by APOGEE-2 South*, Jason A. S. Hunt, Jo Bovy, Angeles Pérez-Villegas, et al. (2017) *Mon. Not. Roy. Astron. Soc.*, in press (`arXiv/1709.02807 <http://arxiv.org/abs/1709.02807>`_):
+     Uses ``galpy.df.evolveddiskdf`` to compute the effect of a fast-rotating Milky-Way bar model on the velocity distribution in the disk of the Milky Way near the Sun to compare to the observed line-of-sight velocity distribution in APOGEE-2 South.
+#. *Detailed chemical abundance analysis of the thick disk star cluster Gaia 1*, Andreas Koch, Terese T. Hansen, & Andrea Kunder (2017) *Astron. & Astrophys.*, in press (`arXiv/1709.04022 <http://arxiv.org/abs/1709.04022>`_):
      Employs ``galpy.orbit`` integration to compute the orbits of four red-giant members of the *Gaia 1* Milky Way star cluster, finding that the orbits of these stars are similar to those of the oldest stars in the Milky Way's disk.
+#. *Proper motions in the VVV Survey: Results for more than 15 million stars across NGC 6544*, R. Contreras Ramos, M. Zoccali, F. Rojas, A. Rojas-Arriagada, M. Gárate, P. Huijse, F. Gran, M. Soto, A.A.R. Valcarce, P. A. Estévez, & D. Minniti (2017) *Astron. & Astrophys.*, in press (`arXiv/1709.07919 <http://arxiv.org/abs/1709.07919>`_):
+     Uses ``galpy.orbit`` integration in ``MWPotential2014`` to calculate the orbit of NGC 6544, a Milky-Way globular cluster, using a newly determined proper motion, finding that it is likely a halo globular cluster based on its orbit.
+#. *How to make a mature accreting magnetar*, A. P. Igoshev & S. B. Popov (2017) *Mon. Not. Roy. Astron. Soc.*, in press (`arXiv/1709.10385 <http://arxiv.org/abs/1709.10385>`_):
+     Employs ``galpy.orbit`` integration of the magnetar candidate 4U 0114+65 in the potential model from `Irrgang et al. (2013) <http://adsabs.harvard.edu/abs/2013A%26A...549A.137I>`__ to aid in the determination of its likely age.
+#. *iota Horologii is unlikely to be an evaporated Hyades star*, I. Ramirez, D. Yong, E. Gutierrez, M. Endl, D. L. Lambert, J.-D. Do Nascimento Jr (2017) *Astrophys. J.*, in press (`arXiv/1710.05930 <http://arxiv.org/abs/1710.05930>`_):
+     Uses ``galpy.orbit`` integration in ``MWPotential2014`` to determine the approximate orbit of the star iota Horologii, a planet-hosting suspected former member of the Hyades cluster, to investigate whether it could have coincided with the Hyades cluster in the past.
+#. *Confirming chemical clocks: asteroseismic age dissection of the Milky Way disk(s)*, V. Silva Aguirre, M. Bojsen-Hansen, D. Slumstrup, et al. (2017) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1710.09847 <http://arxiv.org/abs/1710.09847>`_):
+     Employs ``galpy.orbit`` integration in ``MWPotential2014`` to compute the orbits of a sample of 1989 red giants with spectroscopic and asteroseismic data from the APOKASC catalog, to shed light on the properties of stellar populations defined by age and metallicity.
+#. *The universality of the rapid neutron-capture process revealed by a possible disrupted dwarf galaxy star*, Andrew R. Casey & Kevin C. Schlaufman (2017) *Astrophys. J.*, in press (`arXiv/1711.04776 <http://arxiv.org/abs/1711.04776>`_):
+     Uses ``galpy.orbit`` integration in ``MWPotential2014`` to investigate the orbit and its uncertainty of 2MASS J151113.24–213003.0, an extremely metal-poor field star with measureable r-process abundances, and of other similar metal-poor stars. The authors find that all of these stars are on highly eccentric orbits, possibly indicating that they originated in dwarf galaxies.
+#. *The Gaia-ESO Survey: Churning through the Milky Way*, M. R. Hayden, A. Recio-Blanco, P. de Laverny, et al. (2017) *Astron. & Astrophys.*, in press (`arXiv/1711.05751 <http://arxiv.org/abs/1711.05751>`_):
+     Employs ``galpy.orbit`` integration in ``MWPotential2014`` to study the orbital characteristics (eccentricity, pericentric radius) of a sample of 2,364 stars observed in the Milky Way as part of the Gaia-ESO survey.
+#. *The Evolution of the Galactic Thick Disk with the LAMOST Survey*, Chengdong Li & Gang Zhao (2017) *Astrophys. J.*, **850**, 25 (`2017ApJ...850...25L <http://adsabs.harvard.edu/abs/2017ApJ...850...25L>`_):
+     Uses ``galpy.orbit`` integration in ``MWPotential2014`` to investigate the orbital characteristics (eccentricity, maximum height above the plane, angular momentum) of a sample of about 2,000 stars in the thicker-disk component of the Milky Way.
+#. *The Orbit and Origin of the Ultra-faint Dwarf Galaxy Segue 1*, T. K. Fritz, M. Lokken, N. Kallivayalil, A. Wetzel, S. T. Linden, P. Zivick, & E. J. Tollerud (2017) *Astrophys. J.*, submitted (`arXiv/1711.09097 <http://arxiv.org/abs/1711.09097>`_):
+     Employs ``galpy.orbit`` integration in ``MWPotential2014`` and a version of this potential with a more massive dark-matter halo to investigate the orbit and origin of the dwarf-spheroidal galaxy Segue 1 using a newly measured proper motion with SDSS and LBC data.
+#. *Prospects for detection of hypervelocity stars with Gaia*, T. Marchetti, O. Contigiani, E. M. Rossi, J. G. Albert, A. G. A. Brown, & A. Sesana (2017) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1711.11397 <http://arxiv.org/abs/1711.11397>`_):
+     Uses ``galpy.orbit`` integration in a custom Milky-Way-like potential built from ``galpy.potential`` models to create mock catalogs of hypervelocity stars in the Milky Way for different ejection mechanisms and study the prospects of their detection with *Gaia*.
+#. *The AMBRE project: The thick thin disk and thin thick disk of the Milky Way*, Hayden, M. R., Recio-Blanco, A., de Laverny, P., Mikolaitis, S., & Worley, C. C. (2017) *Astron. & Astrophys.*, **608**, L1 (`arXiv/1712.02358 <http://arxiv.org/abs/1712.02358>`_):
+     Employs ``galpy.orbit`` integration in ``MWPotential2014`` to characterize the orbits of 494 nearby stars analyzed as part of the AMBRE project to learn about their distribution within the Milky Way.
+#. *KELT-21b: A Hot Jupiter Transiting the Rapidly-Rotating Metal-Poor Late-A Primary of a Likely Hierarchical Triple System*, Marshall C. Johnson, Joseph E. Rodriguez, George Zhou, et al. (2017) *Astrophys. J.*, submitted (`arXiv/1712.03241 <http://arxiv.org/abs/1712.03241>`_):
+     Uses ``galpy.orbit`` integration in ``MWPotential2014`` to investigate the Galactic orbit of KELT-21b, a hot jupiter around a low-metallicity A-type star.
+#. *GalDynPsr: A package to estimate dynamical contributions in the rate of change of the period of radio pulsars*, Dhruv Pathak & Manjari Bagchi (2017) (`arXiv/1712.06590 <http://arxiv.org/abs/1712.06590>`_):
+     Presents a python package to compute contributions to the GR spin-down of pulsars from the differential galactic acceleration between the Sun and the pulsar. The package uses ``MWPotential2014`` and ``galpy.potential`` functions to help compute this.
+#. *Local Stellar Kinematics from RAVE data – VIII. Effects of the Galactic Disc Perturbations on Stellar Orbits of Red Clump Stars*, O. Onal Tas, S. Bilir, &  O. Plevne (2018) *Astrophys. Sp. Sc.*, in press (`arXiv/1801.02170 <http://arxiv.org/abs/1801.02170>`_):
+     Employs ``galpy.orbit`` integration in ``MWPotential2014`` and the non-axisymmetric ``DehnenBarPotential`` and ``SteadyLogSpiralPotential`` to study the orbits of Milky-Way red-clump stars.
+#. *The VMC survey XXVIII. Improved measurements of the proper motion of the Galactic globular cluster 47 Tucanae*, F. Niederhofer, M.-R. L. Cioni, S. Rubele, et al. (2018) *Astron. & Astrophys.*, in press (`arXiv/1801.07738 <http://arxiv.org/abs/1801.07738>`_):
+     Uses ``galpy.orbit`` integration in ``MWPotential2014`` to investigate the orbit of the cluster 47 Tuc from a newly measured proper motion, finding that the orbit has an eccentricity of about 0.2 and reaches up to 3.6 kpc above the Galactic midplane.
+#. *Characterising Open Clusters in the solar neighbourhood with the Tycho-Gaia Astrometric Solution*, T. Cantat-Gaudin, A. Vallenari, R. Sordo, F. Pensabene, A. Krone-Martins, A. Moitinho, C. Jordi, L. Casamiquela, L. Balaguer-Núnez, C. Soubiran, N. Brouillet (2018) *Astron. & Astrophys.*, submitted (`arXiv/1801.10042 <http://arxiv.org/abs/1801.10042>`_):
+     Employs ``galpy.orbit`` integration in ``MWPotential2014`` to investigate the orbits of a sample of 128 open clusters with astrometry from the Tycho-*Gaia* Astrometric Solution.
+#. *Fast estimation of orbital parameters in Milky-Way-like potentials*, J. Ted Mackereth & Jo Bovy (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1802.02592 <http://arxiv.org/abs/1802.02592>`_):
+     Introduces the ``galpy.actionAngle.EccZmaxRperiRap`` and related ``galpy.orbit.Orbit`` methods for the fast estimation of the orbital parameters (eccentricity, maximum vertical excursion, and peri/apocenter) in Milky-Way potentials. See :ref:`this section <fastchar>` of the documentation for more info.
+#. *HI Kinematics Along The Minor Axis of M82*, Paul Martini, Adam K. Leroy, Jeffrey G. Mangum, Alberto Bolatto, Katie M. Keating, Karin Sandstrom, & Fabian Walter (2018) *Astrophys. J.*, in press (`arXiv/1802.04359 <http://arxiv.org/abs/1802.04359>`_):
+     Use ``galpy.potential`` components to create a mass model for M82 that consists of a ``HernquistPotential`` bulge, ``MN3ExponentialDiskPotential`` disk, and ``NFWPotential`` dark-matter halo by matching photometric and rotation-curve data.
+#. *Radial velocities of RR Lyrae stars in and around NGC 6441*, Andrea Kunder, Arthur Mills, Joseph Edgecomb, et al. (2018) *Astron. J.*, in press (`arXiv/1802.09562 <http://arxiv.org/abs/1802.09562>`_):
+     Employs ``galpy.orbit`` integration in ``MWPotential2014`` to investigate a possible tidal stream for the globular cluster NGC 6441.
+#. *The 4:1 Outer Lindblad Resonance of a long slow bar as a potential explanation for the Hercules stream*, Jason A. S. Hunt & Jo Bovy (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1803.02358 <http://arxiv.org/abs/1803.02358>`_):
+     Uses ``galpy.potential`` modeling tools (``CosmphiDiskPotential`` and wrappers to grow it [``DehnenSmoothWrapperPotential``] and make it rotate [``SolidBodyRotationWrapperPotential``]) and disk models in ``galpy.df`` to study the effect of the Milky Way bar's hexadecapole (m=4) moment on the velocity distribution of stars in the disk of the Milky Way, finding that it can have a big effect near the 4:1 outer Lindblad resonance, which may be close to the Sun.
+#. *KELT-22Ab: A Massive Hot Jupiter Transiting a Near Solar Twin*, Jonathan Labadie-Bartz, Joseph E. Rodriguez, Keivan G. Stassun, et al. (2018) *Astrophys. J.*, submitted (`arXiv/1803.07559 <http://arxiv.org/abs/1803.07559>`_):
+     Employs ``galpy.orbit`` integration in ``MWPotential2014`` to explore the orbit of KELT-22A, the G2V host star of a transiting hot-jupiter exoplanet, in the Milky Way.
+#. *Dissecting stellar chemical abundance space with t-SNE*, Friedrich Anders, Cristina Chiappini, Basílio X. Santiago, Gal Matijevič, Anna B. Queiroz, Matthias Steinmetz (2018) *Astron. & Astrophys.*, submitted (`arXiv/1803.09341 <http://arxiv.org/abs/1803.09341>`_):
+     Uses the ``galpy.actionAngle.EccZmaxRperiRap`` and related ``galpy.orbit.Orbit`` methods introduced in `Mackereth & Bovy (2018) <https://arxiv.org/abs/1802.02592>`__ to compute the eccentricity and maximum vertical excursion of a sample of solar-neighborhood stars with detailed chemical abundances, ages, and Galactic kinematics.
+#. *Chemo-kinematics of the Milky Way from the SDSS-III MARVELS Survey*, Nolan Grieves, Jian Ge, Neil Thomas, et al. (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1803.11538 <http://arxiv.org/abs/1803.11538>`_):
+     Employs ``galpy.orbit`` integration in a Milky-Way like potential (Miyamoto-Nagai disk, Hernquist bulge, and NFW dark-matter halo) to determine the eccentricity, maximum vertical excursion, and median Galactocentric radius of a sample of a few thousand solar neighborhood stars with spectra from the SDSS MARVELS survey.
+#. *The demographics of neutron star - white dwarf mergers: rates, delay-time distributions and progenitors*, S. Toonen, H.B. Perets, A.P. Igoshev, E. Michaely, & Y. Zenati (2018) *Astron. & Astrophys.*, submitted (`arXiv/1804.01538 <http://arxiv.org/abs/1804.01538>`_):
+     Uses ``galpy.potential`` methods to build mass models for elliptical, dwarf elliptical, plus normal and bulgeless disk galaxies and ``galpy.orbit`` integration to integrate the orbits of neutron-star--white-dwarf binaries kicked by the supernova explosion that created the neutron star, to investigate the spatial distribution of such binaries at the time of their mergers.
+#. *Absolute HST Proper Motion (HSTPROMO) Catalog of Distant Milky Way Globular Clusters: Three-dimensional Systemic Velocities and the Milky Way Mass*, Sangmo Tony Sohn, Laura L. Watkins, Mark A. Fardal, Roeland P. van der Marel, Alis J. Deason, Gurtina Besla, & Andrea Bellini (2018) *Astrophys. J.*, submitted (`arXiv/1804.01994 <http://arxiv.org/abs/1804.01994>`_):
+     Employs ``galpy.orbit`` integration in a custom Milky-Way-like potential (a scaled version of ``MWPotential2014``) to study the orbits of 20 globular clusters in the Milky Way halo for which the authors measured new proper motions.
+#. *Probing the nature of dark matter particles with stellar streams*, Nilanjan Banik, Gianfranco Bertone, Jo Bovy, & Nassim Bozorgnia (2018) *J. Cosmol. Astropart. Phys.*, submitted (`arXiv/1804.04384 <http://arxiv.org/abs/1804.04384>`_):
+     Uses ``galpy.df.streamdf`` and the `galpy extension <https://gist.github.com/jobovy/1be0be25b525e5f50ea3>`_ ``galpy.df.streampepperdf`` to compute the effect of impacts from dark-matter subhalos on stellar streams when dark matter is warm, when there are many fewer such subhalos, and compares this to the standard CDM case.
+#. *Connecting the Milky Way potential profile to the orbital timescales and spatial structure of the Sagittarius Stream*, Mark A. Fardal, Roeland P. van der Marel, David R. Law, Sangmo Tony Sohn, Branimir Sesar, Nina Hernitschek, & Hans-Walter Rix (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1804.04995 <http://arxiv.org/abs/1804.04995>`_):
+     Employs the ``galpy.potential`` module to build models for the Milky Way's gravitational potential and uses ``galpy.orbit`` to integrate the orbits of members of the Sgr stream in a particle-spray model of the Sgr stream, to investigate how the Sgr stream is sensitive to the Milky Way's potential.
+
+     At this point, a flood of papers using ``galpy`` appeared, which we will not attempt to summarize:
+
+#. *Evidence for accreted component in the Galactic discs*, Q. F. Xing. & G. Zhao (2018) *Mon. Not. Roy. Astron. Soc.*, in press (`2018MNRAS.476.5388X <http://adsabs.harvard.edu/abs/2018MNRAS.476.5388X>`_)
+
+#. *The GALAH survey: An abundance, age, and kinematic inventory of the solar neighbourhood made with TGAS*, S. Buder, K. Lind, M. K. Ness, et al. (2018) *Astron. & Astrophys.*, submitted (`arXiv/1804.05869 <http://arxiv.org/abs/1804.05869>`_)
+
+#. *The GALAH survey: Co-orbiting stars and chemical tagging*, Jeffrey D. Simpson, Sarah L. Martell, Gary Da Costa, et al. (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1804.05894 <http://arxiv.org/abs/1804.05894>`_)
+
+#. *Correlations between age, kinematics, and chemistry as seen by the RAVE survey*, Jennifer Wojno, Georges Kordopatis, Matthias Steinmetz, et al. (2018) *Mon. Not. Roy. Astron. Soc.*, in press (`arXiv/1804.06379 <http://arxiv.org/abs/1804.06379>`_)
+
+#. *On the kinematics of a runaway Be star population*, Douglas Boubert & N. Wyn Evans (2018) *Mon. Not. Roy. Astron. Soc.*, in press (`arXiv/1804.05849 <http://arxiv.org/abs/1804.05849>`_)
+
+#. *Unbiased TGAS×LAMOST distances and the role of binarity*, Johanna Coronado, Hans-Walter Rix, & Wilma H. Trick (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1804.07760 <http://arxiv.org/abs/1804.07760>`_)
+
+#. *The Origin of the 300 km/s Stream Near Segue 1*, Sal Wanying Fu, Joshua D. Simon, Matthew Shetrone, et al. (2018) *Astrophys. J.*, submitted (`arXiv/1804.08622 <http://arxiv.org/abs/1804.08622>`_)
+
+#. *Anatomy of the hyper-runaway star LP 40-365 with Gaia*, R. Raddi, M. A. Hollands, B. T. Gaensicke, D. M. Townsley, J. J. Hermes, N. P. Gentile Fusillo, & D. Koester (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1804.09677 <http://arxiv.org/abs/1804.09677>`_)
+
+#. *Revisiting hypervelocity stars after Gaia DR2*, Douglas Boubert, James Guillochon, Keith Hawkins, Idan Ginsburg, & N. Wyn Evans (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1804.10179 <http://arxiv.org/abs/1804.10179>`_)
+
+#. *Gaia Proper Motions and Orbits of the Ultra-Faint Milky Way Satellites*, Joshua D. Simon (2018) *Astrophys. J.*, submitted (`arXiv/1804.10230 <http://arxiv.org/abs/1804.10230>`_)
+
+#. *Three Hypervelocity White Dwarfs in Gaia DR2: Evidence for Dynamically Driven Double-Degenerate Double-Detonation Type Ia Supernovae*, Ken J. Shen, Douglas Boubert, Boris T. Gänsicke, et al. (2018) *Astrophys. J.*, submitted (`arXiv/1804.11163 <http://arxiv.org/abs/1804.11163>`_)
+
+#. *Gaia DR2 Proper Motions of Dwarf Galaxies within 420 kpc: Orbits, Milky Way Mass, Tidal Influences, Planar Alignments, and Group Infall*, T. K. Fritz, G. Battaglia, M. S. Pawlowski, N. Kallivayalil, R. van der Marel, T. S. Sohn, C. Brook, & G. Besla (2018) *Astron. & Astrophys.*, submitted (`arXiv/1805.00908 <http://arxiv.org/abs/1805.00908>`_)
+
+#. *The Lives of Stars: Insights From the TGAS-RAVE-LAMOST Dataset*, John J. Vickers & Martin C. Smith (2018) *Astrophys. J.*, in press (`arXiv/1805.02332 <http://arxiv.org/abs/1805.02332>`_)
+
+#. *High precision pulsar timing and spin frequency second derivatives*, X. J. Liu, C. G. Bassa, & B. W. Stappers (2018) *Mon. Not. Roy. Astron. Soc.*, in press (`arXiv/1805.02892 <http://arxiv.org/abs/1805.02892>`_)
+#. *The Galactic Disc in Action Space as seen by Gaia DR2*, Wilma H. Trick, Johanna Coronado, Hans-Walter Rix (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1805.03653 <http://arxiv.org/abs/1805.03653>`_):
+     Uses ``galpy.actionAngle.actionAngleStaeckel`` to compute the actions in ``galpy.potential.MWPotential2014`` of stars in the extended solar neighborhood in *Gaia* DR2.
+#. *Tidal ribbons*, Walter Dehnen & Hasanuddin (2018) *Mon. Not. Roy. Astron. Soc.*, submitted (`arXiv/1805.08481 <http://arxiv.org/abs/1805.08481>`_):
+     Employs ``galpy.actionAngle.actionAngleStaeckel`` to compute the actions and frequencies of a disrupted satellite on an orbit close to the Galactic disk, to investigate the difference between the debris from such an orbit and from an orbit well within the halo.
 
 Indices and tables
 ==================

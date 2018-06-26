@@ -373,7 +373,10 @@ def test_qdf():
     assert numpy.fabs(df(Orbit([0.9,0.1,0.8,0.05,0.02]),log=True)-numpy.array([ 4.81682066])) < 10.**-4., 'qdf does not behave as expected'
     # Evaluate DF marginalized over vz
     df.pvRvT(0.1,0.9,0.9,0.05)
-    assert numpy.fabs(df.pvRvT(0.1,0.9,0.9,0.05)-23.273310451852243) < 10.**-4., 'qdf does not behave as expected'
+    assert numpy.fabs(df.pvRvT(0.1,0.9,0.9,0.05)-2.*23.273310451852243) < 10.**-4., 'qdf does not behave as expected'
+    #NOTE: The pvRvT() function has changed with respect to the version used in Bovy (2015).
+    #      As of January 2018, a prefactor of 2 has been added (=nsigma/2 with default nsigma=4),
+    #      to account for the correct Gauss-Legendre integration normalization.
     # Evaluate DF marginalized over vR,vT
     df.pvz(0.02,0.9,0.05)
     assert numpy.fabs(df.pvz(0.02,0.9,0.05)-50.949586235238172) < 10.**-4., 'qdf does not behave as expected'
@@ -401,8 +404,9 @@ def test_qdf():
     assert numpy.fabs(sqrt(df.sigmaR2(0.9,0.05))-0.22695537077102387) < 10.**-4., 'qdf does not behave as expected'
     assert numpy.fabs(sqrt(df.sigmaz2(0.9,0.05))-0.094215523962105044) < 10.**-4., 'qdf does not behave as expected'
     # Calculate the tilt of the velocity ellipsoid
+    # 2017/10-28: CHANGED bc tilt now returns angle in rad, no longer in deg
     df.tilt(0.9,0.05)
-    assert numpy.fabs(df.tilt(0.9,0.05)-2.5166061974413765) < 10.**-4., 'qdf does not behave as expected'
+    assert numpy.fabs(df.tilt(0.9,0.05)-2.5166061974413765/180.*numpy.pi) < 10.**-4., 'qdf does not behave as expected'
     # Calculate a higher-order moment of the velocity DF
     df.vmomentdensity(0.9,0.05,6.,2.,2.,gl=True)
     assert numpy.fabs(df.vmomentdensity(0.9,0.05,6.,2.,2.,gl=True)-0.0001591100892366438) < 10.**-4., 'qdf does not behave as expected'

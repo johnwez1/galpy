@@ -91,8 +91,16 @@ double LogarithmicHaloPotentialPlanarRforce(double ,double, double,
 				    struct potentialArg *);
 double LogarithmicHaloPotentialzforce(double,double,double,double,
 				    struct potentialArg *);
+double LogarithmicHaloPotentialphiforce(double,double,double,double,
+					struct potentialArg *);
+double LogarithmicHaloPotentialPlanarphiforce(double,double,double,
+					      struct potentialArg *);
 double LogarithmicHaloPotentialPlanarR2deriv(double ,double, double,
 				    struct potentialArg *);
+double LogarithmicHaloPotentialPlanarphi2deriv(double ,double, double,
+					       struct potentialArg *);
+double LogarithmicHaloPotentialPlanarRphideriv(double ,double, double,
+					       struct potentialArg *);
 //DehnenBarPotential
 double DehnenBarPotentialRforce(double,double,double,double,
 				struct potentialArg *);
@@ -462,6 +470,53 @@ double CosmphiDiskPotentialphi2deriv(double,double,double,
 					   struct potentialArg *);
 double CosmphiDiskPotentialRphideriv(double,double,double,
 					   struct potentialArg *);
+//HenonHeilesPotential
+double HenonHeilesPotentialRforce(double,double,double,
+				  struct potentialArg *);
+double HenonHeilesPotentialphiforce(double,double,double,
+				    struct potentialArg *);
+double HenonHeilesPotentialR2deriv(double,double,double,
+				   struct potentialArg *);
+double HenonHeilesPotentialphi2deriv(double,double,double,
+				     struct potentialArg *);
+double HenonHeilesPotentialRphideriv(double,double,double,
+				     struct potentialArg *);
+//CorotatingRotationWrapperPotential
+double CorotatingRotationWrapperPotentialRforce(double,double,double,double,
+					struct potentialArg *);
+double CorotatingRotationWrapperPotentialphiforce(double,double,double,double,
+					    struct potentialArg *);
+double CorotatingRotationWrapperPotentialzforce(double,double,double,double,
+				        struct potentialArg *);
+double CorotatingRotationWrapperPotentialPlanarRforce(double,double,double,
+						struct potentialArg *);
+double CorotatingRotationWrapperPotentialPlanarphiforce(double,double,double,
+						  struct potentialArg *);
+double CorotatingRotationWrapperPotentialPlanarR2deriv(double,double,double,
+						 struct potentialArg *);
+double CorotatingRotationWrapperPotentialPlanarphi2deriv(double,double,double,
+						   struct potentialArg *);
+double CorotatingRotationWrapperPotentialPlanarRphideriv(double,double,double,
+						   struct potentialArg *);
+//GaussianAmplitudeWrapperPotential
+double GaussianAmplitudeWrapperPotentialEval(double,double,double,double,
+				      struct potentialArg *);
+double GaussianAmplitudeWrapperPotentialRforce(double,double,double,double,
+					struct potentialArg *);
+double GaussianAmplitudeWrapperPotentialphiforce(double,double,double,double,
+					    struct potentialArg *);
+double GaussianAmplitudeWrapperPotentialzforce(double,double,double,double,
+				        struct potentialArg *);
+double GaussianAmplitudeWrapperPotentialPlanarRforce(double,double,double,
+						struct potentialArg *);
+double GaussianAmplitudeWrapperPotentialPlanarphiforce(double,double,double,
+						  struct potentialArg *);
+double GaussianAmplitudeWrapperPotentialPlanarR2deriv(double,double,double,
+						 struct potentialArg *);
+double GaussianAmplitudeWrapperPotentialPlanarphi2deriv(double,double,double,
+						   struct potentialArg *);
+double GaussianAmplitudeWrapperPotentialPlanarRphideriv(double,double,double,
+						   struct potentialArg *);
 #ifdef __cplusplus
 }
 #endif

@@ -1,5 +1,5 @@
 import sys
-import sysconfig
+import distutils.sysconfig as sysconfig
 import warnings
 import numpy as nu
 import ctypes
@@ -13,9 +13,9 @@ from galpy.orbit_src.integratePlanarOrbit import _parse_integrator, _parse_tol
 _lib= None
 outerr= None
 PY3= sys.version > '3'
-if PY3: #pragma: no cover
+if PY3:
     _ext_suffix= sysconfig.get_config_var('EXT_SUFFIX')
-else:
+else: #pragma: no cover
     _ext_suffix= '.so'
 for path in sys.path:
     try:
@@ -49,7 +49,10 @@ def _parse_pot(pot,potforactions=False,potfortorus=False):
     for p in pot:
         if isinstance(p,potential.LogarithmicHaloPotential):
             pot_type.append(0)
-            pot_args.extend([p._amp,p._q,p._core2])
+            if p.isNonAxi:
+                pot_args.extend([p._amp,p._q,p._core2,p._1m1overb2])
+            else:
+                pot_args.extend([p._amp,p._q,p._core2,2.]) # 1m1overb2 > 1: axi
         elif isinstance(p,potential.DehnenBarPotential):
             pot_type.append(1)
             pot_args.extend([p._amp*p._af,p._tform,p._tsteady,p._rb,p._omegab,
@@ -91,11 +94,24 @@ def _parse_pot(pot,potforactions=False,potfortorus=False):
             else:
                 pot_args.extend([p._rgrid[ii] for ii in range(len(p._rgrid))])
             pot_args.extend([p._zgrid[ii] for ii in range(len(p._zgrid))])
-            if potforactions or potfortorus:
+            if hasattr(p,'_potGrid_splinecoeffs'):
                 pot_args.extend([x for x in p._potGrid_splinecoeffs.flatten(order='C')])
-            if not potforactions:
+            else: # pragma: no cover
+                warnings.warn("You are attempting to use the C implementation of interpRZPotential, but have not interpolated the potential itself; if you think this is needed for what you want to do, initialize the interpRZPotential instance with interpPot=True",
+                      galpyWarning)
+                pot_args.extend(list(nu.ones(len(p._rgrid)*len(p._zgrid))))
+            if hasattr(p,'_rforceGrid_splinecoeffs'):
                 pot_args.extend([x for x in p._rforceGrid_splinecoeffs.flatten(order='C')])
+            else: # pragma: no cover
+                warnings.warn("You are attempting to use the C implementation of interpRZPotential, but have not interpolated the Rforce; if you think this is needed for what you want to do, initialize the interpRZPotential instance with interpRforce=True",
+                      galpyWarning)
+                pot_args.extend(list(nu.ones(len(p._rgrid)*len(p._zgrid))))
+            if hasattr(p,'_zforceGrid_splinecoeffs'):
                 pot_args.extend([x for x in p._zforceGrid_splinecoeffs.flatten(order='C')])
+            else: # pragma: no cover
+                warnings.warn("You are attempting to use the C implementation of interpRZPotential, but have not interpolated the zforce; if you think this is needed for what you want to do, initialize the interpRZPotential instance with interpzforce=True",
+                      galpyWarning)
+                pot_args.extend(list(nu.ones(len(p._rgrid)*len(p._zgrid))))
             pot_args.extend([p._amp,int(p._logR)])
         elif isinstance(p,potential.IsochronePotential):
             pot_type.append(14)
@@ -196,7 +212,7 @@ def _parse_pot(pot,potforactions=False,potfortorus=False):
             wrap_npot, wrap_pot_type, wrap_pot_args= \
                 _parse_pot(p._pot,
                            potforactions=potforactions,potfortorus=potfortorus)
-            pot_args.extend([wrap_npot,len(wrap_pot_args)])
+            pot_args.append(wrap_npot)
             pot_type.extend(wrap_pot_type)
             pot_args.extend(wrap_pot_args)
             pot_args.extend([p._amp,p._tform,p._tsteady])
@@ -206,10 +222,29 @@ def _parse_pot(pot,potforactions=False,potfortorus=False):
             wrap_npot, wrap_pot_type, wrap_pot_args= \
                 _parse_pot(p._pot,
                            potforactions=potforactions,potfortorus=potfortorus)
-            pot_args.extend([wrap_npot,len(wrap_pot_args)])
+            pot_args.append(wrap_npot)
             pot_type.extend(wrap_pot_type)
             pot_args.extend(wrap_pot_args)
             pot_args.extend([p._amp,p._omega,p._pa])
+        elif isinstance(p,potential.CorotatingRotationWrapperPotential):
+            pot_type.append(-4)
+            # Not sure how to easily avoid this duplication
+            wrap_npot, wrap_pot_type, wrap_pot_args= \
+                _parse_pot(p._pot,
+                           potforactions=potforactions,potfortorus=potfortorus)
+            pot_args.append(wrap_npot)
+            pot_type.extend(wrap_pot_type)
+            pot_args.extend(wrap_pot_args)
+            pot_args.extend([p._amp,p._vpo,p._beta,p._pa,p._to])
+        elif isinstance(p,potential.GaussianAmplitudeWrapperPotential):
+            pot_type.append(-5)
+            wrap_npot, wrap_pot_type, wrap_pot_args= \
+                _parse_pot(p._pot,
+                           potforactions=potforactions,potfortorus=potfortorus)
+            pot_args.append(wrap_npot)
+            pot_type.extend(wrap_pot_type)
+            pot_args.extend(wrap_pot_args)
+            pot_args.extend([p._amp,p._to,p._sigma2])
     pot_type= nu.array(pot_type,dtype=nu.int32,order='C')
     pot_args= nu.array(pot_args,dtype=nu.float64,order='C')
     return (npot,pot_type,pot_args)

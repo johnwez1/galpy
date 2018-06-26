@@ -1,6 +1,4 @@
 import warnings
-from galpy.util import galpyWarning
-warnings.warn("A major change in versions > 1.1 is that all galpy.potential functions and methods take the potential as the first argument; previously methods such as evaluatePotentials, evaluateDensities, etc. would be called with (R,z,Pot), now they are called as (Pot,R,z) for greater consistency across the codebase",galpyWarning)
 from galpy.potential_src import Potential
 from galpy.potential_src import planarPotential
 from galpy.potential_src import linearPotential
@@ -38,8 +36,11 @@ from galpy.potential_src import SCFPotential
 from galpy.potential_src import SoftenedNeedleBarPotential
 from galpy.potential_src import DiskSCFPotential
 from galpy.potential_src import SpiralArmsPotential
+from galpy.potential_src import HenonHeilesPotential
 from galpy.potential_src import DehnenSmoothWrapperPotential
 from galpy.potential_src import SolidBodyRotationWrapperPotential
+from galpy.potential_src import CorotatingRotationWrapperPotential
+from galpy.potential_src import GaussianAmplitudeWrapperPotential
 #
 # Functions
 #
@@ -52,6 +53,9 @@ evaluaterforces= Potential.evaluaterforces
 evaluateR2derivs= Potential.evaluateR2derivs
 evaluatez2derivs= Potential.evaluatez2derivs
 evaluateRzderivs= Potential.evaluateRzderivs
+evaluatephi2derivs= Potential.evaluatephi2derivs
+evaluateRphiderivs= Potential.evaluateRphiderivs
+evaluater2derivs= Potential.evaluater2derivs
 RZToplanarPotential= planarPotential.RZToplanarPotential
 toPlanarPotential= planarPotential.toPlanarPotential
 RZToverticalPotential= verticalPotential.RZToverticalPotential
@@ -90,6 +94,9 @@ _isNonAxi= Potential._isNonAxi
 scf_compute_coeffs_spherical = SCFPotential.scf_compute_coeffs_spherical
 scf_compute_coeffs_axi = SCFPotential.scf_compute_coeffs_axi
 scf_compute_coeffs = SCFPotential.scf_compute_coeffs
+rtide= Potential.rtide
+ttensor= Potential.ttensor
+flatten= Potential.flatten
 #
 # Classes
 #
@@ -136,9 +143,12 @@ SCFPotential = SCFPotential.SCFPotential
 SoftenedNeedleBarPotential= SoftenedNeedleBarPotential.SoftenedNeedleBarPotential
 DiskSCFPotential = DiskSCFPotential.DiskSCFPotential
 SpiralArmsPotential = SpiralArmsPotential.SpiralArmsPotential
+HenonHeilesPotential= HenonHeilesPotential.HenonHeilesPotential
 #Wrappers
 DehnenSmoothWrapperPotential= DehnenSmoothWrapperPotential.DehnenSmoothWrapperPotential
 SolidBodyRotationWrapperPotential= SolidBodyRotationWrapperPotential.SolidBodyRotationWrapperPotential
+CorotatingRotationWrapperPotential= CorotatingRotationWrapperPotential.CorotatingRotationWrapperPotential
+GaussianAmplitudeWrapperPotential= GaussianAmplitudeWrapperPotential.GaussianAmplitudeWrapperPotential
 #Softenings
 PlummerSoftening= ForceSoftening.PlummerSoftening
 
